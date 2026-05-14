@@ -120,6 +120,7 @@ func TestTopologyHandlerGetNodeNotFound(t *testing.T) {
 func TestTopologyHandlerGetPortsByNode(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	svc := mocks.NewTopologyService(t)
 	mux := testMux(svc)
 	ports := []domain.Port{{ID: 1, NodeID: 2, Name: "eth0", Status: "active"}}
@@ -129,7 +130,7 @@ func TestTopologyHandlerGetPortsByNode(t *testing.T) {
 		Return(ports, nil).
 		Once()
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/port/2", nil)
+	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/port/2", nil)
 	rec := httptest.NewRecorder()
 
 	mux.ServeHTTP(rec, req)
@@ -141,6 +142,7 @@ func TestTopologyHandlerGetPortsByNode(t *testing.T) {
 func TestTopologyHandlerGetLog(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	svc := mocks.NewTopologyService(t)
 	mux := testMux(svc)
 	uploadedAt := time.Date(2026, time.May, 15, 10, 0, 0, 0, time.UTC)
@@ -151,7 +153,7 @@ func TestTopologyHandlerGetLog(t *testing.T) {
 		Return(log, nil).
 		Once()
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/log/1", nil)
+	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/log/1", nil)
 	rec := httptest.NewRecorder()
 
 	mux.ServeHTTP(rec, req)
@@ -163,10 +165,11 @@ func TestTopologyHandlerGetLog(t *testing.T) {
 func TestTopologyHandlerRejectsInvalidID(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	svc := mocks.NewTopologyService(t)
 	mux := testMux(svc)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/log/abc", nil)
+	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/log/abc", nil)
 	rec := httptest.NewRecorder()
 
 	mux.ServeHTTP(rec, req)
@@ -179,6 +182,7 @@ func TestTopologyHandlerRejectsInvalidID(t *testing.T) {
 func TestTopologyHandlerReturnsInternalError(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	svc := mocks.NewTopologyService(t)
 	mux := testMux(svc)
 
@@ -187,7 +191,7 @@ func TestTopologyHandlerReturnsInternalError(t *testing.T) {
 		Return(domain.Log{}, errors.New("db down")).
 		Once()
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/log/1", nil)
+	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/log/1", nil)
 	rec := httptest.NewRecorder()
 
 	mux.ServeHTTP(rec, req)
