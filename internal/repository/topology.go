@@ -63,7 +63,7 @@ func (r *TopologyRepository) ProcessParsedLog(ctx context.Context, logID int64, 
 	if err != nil {
 		return fmt.Errorf("prepare insert node: %w", err)
 	}
-	defer nodeStmt.Close()
+	defer func() { _ = nodeStmt.Close() }()
 
 	portStmt, err := tx.PrepareContext(ctx, `
 		INSERT INTO ports(node_id, name, mac, ip, status, speed)
@@ -72,7 +72,7 @@ func (r *TopologyRepository) ProcessParsedLog(ctx context.Context, logID int64, 
 	if err != nil {
 		return fmt.Errorf("prepare insert port: %w", err)
 	}
-	defer portStmt.Close()
+	defer func() { _ = portStmt.Close() }()
 
 	infoStmt, err := tx.PrepareContext(ctx, `
 		INSERT INTO nodes_info(node_id, key, value)
@@ -81,7 +81,7 @@ func (r *TopologyRepository) ProcessParsedLog(ctx context.Context, logID int64, 
 	if err != nil {
 		return fmt.Errorf("prepare insert node info: %w", err)
 	}
-	defer infoStmt.Close()
+	defer func() { _ = infoStmt.Close() }()
 
 	for _, node := range parsed.Nodes {
 		var nodeID int64
@@ -188,7 +188,7 @@ func (r *TopologyRepository) GetPortsByNode(ctx context.Context, nodeID int64) (
 	if err != nil {
 		return nil, fmt.Errorf("query ports: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	ports := make([]domain.Port, 0)
 	for rows.Next() {
@@ -213,7 +213,7 @@ func (r *TopologyRepository) listNodes(ctx context.Context, condition string, ar
 	if err != nil {
 		return nil, fmt.Errorf("query nodes: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	nodes := make([]domain.Node, 0)
 	for rows.Next() {
@@ -240,7 +240,7 @@ func (r *TopologyRepository) getNodeInfo(ctx context.Context, nodeID int64) ([]d
 	if err != nil {
 		return nil, fmt.Errorf("query node info: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	info := make([]domain.NodeInfo, 0)
 	for rows.Next() {

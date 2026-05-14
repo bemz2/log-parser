@@ -42,7 +42,7 @@ type parseRequest struct {
 }
 
 func (h *TopologyHandler) Parse(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 
 	var req parseRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

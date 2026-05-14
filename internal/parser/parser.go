@@ -25,7 +25,7 @@ func (p *Parser) ParseFile(ctx context.Context, path string) (domain.ParsedLog, 
 	if err != nil {
 		return domain.ParsedLog{}, fmt.Errorf("open file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	return p.Parse(ctx, file)
 }

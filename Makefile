@@ -1,5 +1,7 @@
 GO ?= go
 MOCKERY ?= $(shell $(GO) env GOPATH)/bin/mockery
+GOLANGCI_LINT ?= $(shell $(GO) env GOPATH)/bin/golangci-lint
+GOLANGCI_LINT_VERSION ?= v2.12.2
 DOCKER_COMPOSE ?= docker compose
 GOMODCACHE ?=
 MOCKERY_GOCACHE ?= /tmp/log-parser-mockery-go-build
@@ -8,7 +10,7 @@ GO_FILES := $(shell find . -type f | grep '\.go$$')
 BIN_DIR := $(CURDIR)/bin
 APP_BIN := log-parser
 
-.PHONY: setup ensure-configs ensure-env ensure-compose infra-up infra-down run tidy fmt gofmt lint test mocks build clean compose-up compose-down logs
+.PHONY: setup ensure-configs ensure-env ensure-compose infra-up infra-down run tidy fmt fmt-check gofmt lint test mocks build clean compose-up compose-down logs
 
 ifneq ($(strip $(GOMODCACHE)),)
 GOENV += GOMODCACHE=$(GOMODCACHE)
@@ -44,11 +46,15 @@ tidy:
 fmt:
 	$(GOENV) $(GO) fmt ./...
 
+fmt-check:
+	test -z "$$($(GOENV) $(GO) fmt ./...)"
+
 gofmt:
 	gofmt -w $(GO_FILES)
 
-lint:
-	$(GOENV) $(GO) vet ./...
+lint: mocks
+	test -x $(GOLANGCI_LINT) || $(GO) install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
+	$(GOLANGCI_LINT) run ./...
 
 test: mocks
 	$(GOENV) $(GO) test ./...
