@@ -1,0 +1,41 @@
+services:
+  app:
+    build: .
+    container_name: topology-parser-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: "8080"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: topology
+      DB_PASSWORD: topology
+      DB_NAME: topology
+      DATA_DIR: data
+      MIGRATIONS_DIR: migrations
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data:ro
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: topology-parser-postgres
+    environment:
+      POSTGRES_USER: topology
+      POSTGRES_PASSWORD: topology
+      POSTGRES_DB: topology
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U topology -d topology"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+
