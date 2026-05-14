@@ -44,6 +44,7 @@ func TestTopologyHandlerParseSuccess(t *testing.T) {
 func TestTopologyHandlerParseInvalidPath(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	svc := mocks.NewTopologyService(t)
 	mux := testMux(svc)
 
@@ -52,7 +53,7 @@ func TestTopologyHandlerParseInvalidPath(t *testing.T) {
 		Return(service.ParseResult{}, service.ErrInvalidPath).
 		Once()
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/parse", bytes.NewBufferString(`{"path":"../secret.log"}`))
+	req := httptest.NewRequestWithContext(ctx, http.MethodPost, "/api/v1/parse", bytes.NewBufferString(`{"path":"../secret.log"}`))
 	rec := httptest.NewRecorder()
 
 	mux.ServeHTTP(rec, req)
@@ -64,6 +65,7 @@ func TestTopologyHandlerParseInvalidPath(t *testing.T) {
 func TestTopologyHandlerGetTopology(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	svc := mocks.NewTopologyService(t)
 	mux := testMux(svc)
 	expected := domain.Topology{
@@ -85,7 +87,7 @@ func TestTopologyHandlerGetTopology(t *testing.T) {
 		Return(expected, nil).
 		Once()
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/topology/1", nil)
+	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/topology/1", nil)
 	rec := httptest.NewRecorder()
 
 	mux.ServeHTTP(rec, req)
@@ -97,6 +99,7 @@ func TestTopologyHandlerGetTopology(t *testing.T) {
 func TestTopologyHandlerGetNodeNotFound(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	svc := mocks.NewTopologyService(t)
 	mux := testMux(svc)
 
@@ -105,7 +108,7 @@ func TestTopologyHandlerGetNodeNotFound(t *testing.T) {
 		Return(domain.Node{}, service.ErrNotFound).
 		Once()
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/node/404", nil)
+	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/node/404", nil)
 	rec := httptest.NewRecorder()
 
 	mux.ServeHTTP(rec, req)

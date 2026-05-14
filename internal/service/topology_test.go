@@ -17,6 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const nodeTypeSwitch = "switch"
+
 func TestTopologyServiceParseSuccess(t *testing.T) {
 	ctx := context.Background()
 	dataDir, requestedPath, absPath := createTestLog(t, "valid.log")
@@ -25,7 +27,7 @@ func TestTopologyServiceParseSuccess(t *testing.T) {
 			{
 				ExternalID: "switch-1",
 				Name:       "switch-1",
-				Type:       "switch",
+				Type:       nodeTypeSwitch,
 				Ports:      []domain.Port{{Name: "eth0", Status: "active"}},
 			},
 		},
@@ -117,8 +119,8 @@ func TestTopologyServiceReadMethodsDelegateToRepository(t *testing.T) {
 	parser := mocks.NewLogParser(t)
 	svc := service.NewTopologyService(repo, parser, "data", testLogger())
 
-	expectedTopology := domain.Topology{LogID: 1, Nodes: []domain.Node{{ID: 2, Name: "switch"}}}
-	expectedNode := domain.Node{ID: 2, Name: "switch"}
+	expectedTopology := domain.Topology{LogID: 1, Nodes: []domain.Node{{ID: 2, Name: nodeTypeSwitch}}}
+	expectedNode := domain.Node{ID: 2, Name: nodeTypeSwitch}
 	expectedPorts := []domain.Port{{ID: 3, NodeID: 2, Name: "eth0"}}
 	expectedLog := domain.Log{ID: 1, Status: domain.LogStatusParsed}
 
