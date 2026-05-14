@@ -8,7 +8,7 @@ GO_FILES := $(shell find . -type f | grep '\.go$$')
 BIN_DIR := $(CURDIR)/bin
 APP_BIN := log-parser
 
-.PHONY: setup ensure-configs ensure-env ensure-compose infra-up infra-down run tidy fmt test mocks build clean compose-up compose-down logs
+.PHONY: setup ensure-configs ensure-env ensure-compose infra-up infra-down run tidy fmt gofmt lint test mocks build clean compose-up compose-down logs
 
 ifneq ($(strip $(GOMODCACHE)),)
 GOENV += GOMODCACHE=$(GOMODCACHE)
@@ -42,7 +42,13 @@ tidy:
 	$(GOENV) $(GO) mod tidy
 
 fmt:
+	$(GOENV) $(GO) fmt ./...
+
+gofmt:
 	gofmt -w $(GO_FILES)
+
+lint:
+	$(GOENV) $(GO) vet ./...
 
 test: mocks
 	$(GOENV) $(GO) test ./...
