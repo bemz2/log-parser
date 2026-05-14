@@ -6,13 +6,13 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/topology-parser ./cmd/topology-parser
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/log-parser ./cmd/log-parser
 
 FROM alpine:3.20
 
 WORKDIR /app
 
-COPY --from=builder /bin/topology-parser /app/topology-parser
+COPY --from=builder /bin/log-parser /app/log-parser
 COPY migrations /app/migrations
 COPY data /app/data
 
@@ -22,4 +22,4 @@ ENV MIGRATIONS_DIR=migrations
 
 EXPOSE 8080
 
-CMD ["/app/topology-parser"]
+CMD ["/app/log-parser"]

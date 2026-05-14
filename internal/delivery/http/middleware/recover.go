@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	transport "topology-parser/internal/delivery/http"
+	transport "log-parser/internal/delivery/http"
 )
 
 func Recover(logger *slog.Logger) func(http.Handler) http.Handler {

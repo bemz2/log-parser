@@ -5,12 +5,12 @@ import (
 	"database/sql"
 	"log/slog"
 
-	"topology-parser/internal"
-	"topology-parser/internal/client/postgres"
-	handler "topology-parser/internal/delivery/http/handler"
-	"topology-parser/internal/migration"
-	"topology-parser/internal/repository"
-	"topology-parser/internal/service"
+	"log-parser/internal"
+	"log-parser/internal/client/postgres"
+	handler "log-parser/internal/delivery/http/handler"
+	"log-parser/internal/migration"
+	"log-parser/internal/repository"
+	"log-parser/internal/service"
 )
 
 type Container struct {

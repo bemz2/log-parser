@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"topology-parser/internal"
-	"topology-parser/internal/application"
+	"log-parser/internal"
+	"log-parser/internal/application"
 )
 
 func main() {

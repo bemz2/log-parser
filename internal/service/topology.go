@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"topology-parser/internal/domain"
-	"topology-parser/internal/parser"
-	"topology-parser/internal/repository"
+	"log-parser/internal/domain"
+	"log-parser/internal/parser"
+	"log-parser/internal/repository"
 )
 
 var (

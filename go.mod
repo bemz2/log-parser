@@ -1,4 +1,4 @@
-module topology-parser
+module log-parser
 
 go 1.26
 

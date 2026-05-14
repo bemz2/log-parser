@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"net/http"
 
-	"topology-parser/internal"
-	transport "topology-parser/internal/delivery/http"
-	"topology-parser/internal/delivery/http/middleware"
+	"log-parser/internal"
+	transport "log-parser/internal/delivery/http"
+	"log-parser/internal/delivery/http/middleware"
 )
 
 const APIV1Prefix = "/api/v1"

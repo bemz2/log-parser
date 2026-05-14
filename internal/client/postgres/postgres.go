@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"time"
 
-	"topology-parser/internal"
+	"log-parser/internal"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )

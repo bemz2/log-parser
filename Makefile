@@ -4,7 +4,7 @@ GOMODCACHE ?=
 GOENV :=
 GO_FILES := $(shell find . -type f | grep '\.go$$')
 BIN_DIR := $(CURDIR)/bin
-APP_BIN := topology-parser
+APP_BIN := log-parser
 
 .PHONY: setup infra-up infra-down run tidy fmt test build clean compose-up compose-down logs
 
@@ -25,7 +25,7 @@ infra-down:
 	$(DOCKER_COMPOSE) down
 
 run:
-	$(GOENV) $(GO) run ./cmd/topology-parser
+	$(GOENV) $(GO) run ./cmd/log-parser
 
 tidy:
 	$(GOENV) $(GO) mod tidy
@@ -38,7 +38,7 @@ test:
 
 build:
 	mkdir -p $(BIN_DIR)
-	$(GOENV) $(GO) build -o $(BIN_DIR)/$(APP_BIN) ./cmd/topology-parser
+	$(GOENV) $(GO) build -o $(BIN_DIR)/$(APP_BIN) ./cmd/log-parser
 
 compose-up:
 	$(DOCKER_COMPOSE) up -d --build

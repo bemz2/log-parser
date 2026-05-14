@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"topology-parser/internal/domain"
+	"log-parser/internal/domain"
 )
 
 type TopologyRepository struct {

@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"topology-parser/internal/domain"
+	"log-parser/internal/domain"
 )
 
 type Parser struct{}

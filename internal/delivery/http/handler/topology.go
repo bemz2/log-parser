@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	transport "topology-parser/internal/delivery/http"
-	"topology-parser/internal/domain"
-	"topology-parser/internal/service"
+	transport "log-parser/internal/delivery/http"
+	"log-parser/internal/domain"
+	"log-parser/internal/service"
 )
 
 type TopologyService interface {
