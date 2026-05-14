@@ -1,12 +1,14 @@
 GO ?= go
+MOCKERY ?= $(shell $(GO) env GOPATH)/bin/mockery
 DOCKER_COMPOSE ?= docker compose
 GOMODCACHE ?=
+MOCKERY_GOCACHE ?= /tmp/log-parser-mockery-go-build
 GOENV :=
 GO_FILES := $(shell find . -type f | grep '\.go$$')
 BIN_DIR := $(CURDIR)/bin
 APP_BIN := log-parser
 
-.PHONY: setup infra-up infra-down run tidy fmt test build clean compose-up compose-down logs
+.PHONY: setup ensure-configs ensure-env ensure-compose infra-up infra-down run tidy fmt test mocks build clean compose-up compose-down logs
 
 ifneq ($(strip $(GOMODCACHE)),)
 GOENV += GOMODCACHE=$(GOMODCACHE)
@@ -14,9 +16,18 @@ endif
 
 setup:
 	$(MAKE) clean
+	$(MAKE) ensure-configs
 	$(if $(strip $(GOMODCACHE)),mkdir -p $(GOMODCACHE),true)
 	$(GOENV) $(GO) mod download
 	$(MAKE) infra-up
+
+ensure-configs: ensure-env ensure-compose
+
+ensure-env:
+	test -f .env || cp .env.sample .env
+
+ensure-compose:
+	test -f docker-compose.yml || cp samples/docker-compose.yml.sample docker-compose.yml
 
 infra-up:
 	$(DOCKER_COMPOSE) up -d postgres
@@ -33,8 +44,15 @@ tidy:
 fmt:
 	gofmt -w $(GO_FILES)
 
-test:
+test: mocks
 	$(GOENV) $(GO) test ./...
+
+mocks:
+	mkdir -p mocks
+	test -x $(MOCKERY) || $(GO) install github.com/vektra/mockery/v2@v2.53.6
+	GOCACHE=$(MOCKERY_GOCACHE) $(MOCKERY) --config .mockery.yaml --dir internal/service --name TopologyRepository --output mocks --outpkg mocks --filename topology_repository.go --structname TopologyRepository
+	GOCACHE=$(MOCKERY_GOCACHE) $(MOCKERY) --config .mockery.yaml --dir internal/service --name LogParser --output mocks --outpkg mocks --filename log_parser.go --structname LogParser
+	GOCACHE=$(MOCKERY_GOCACHE) $(MOCKERY) --config .mockery.yaml --dir internal/delivery/http/handler --name TopologyService --output mocks --outpkg mocks --filename topology_service.go --structname TopologyService
 
 build:
 	mkdir -p $(BIN_DIR)
