@@ -1,0 +1,88 @@
+{
+  "info": {
+    "name": "topology-parser",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "log_id",
+      "value": "1"
+    },
+    {
+      "key": "node_id",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "parse",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"path\": \"data/ibdiagnet2.db_csv\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/parse",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "parse"]
+        }
+      }
+    },
+    {
+      "name": "topology",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/v1/topology/{{log_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "topology", "{{log_id}}"]
+        }
+      }
+    },
+    {
+      "name": "node",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/v1/node/{{node_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "node", "{{node_id}}"]
+        }
+      }
+    },
+    {
+      "name": "port",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/v1/port/{{node_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "port", "{{node_id}}"]
+        }
+      }
+    },
+    {
+      "name": "log",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/v1/log/{{log_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "log", "{{log_id}}"]
+        }
+      }
+    }
+  ]
+}
+
