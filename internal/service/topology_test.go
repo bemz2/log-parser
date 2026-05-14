@@ -45,7 +45,7 @@ func TestTopologyServiceParseSuccess(t *testing.T) {
 		Once()
 	repo.EXPECT().
 		ProcessParsedLog(ctx, int64(10), mock.Anything).
-		RunAndReturn(func(txCtx context.Context, logID int64, parse func(context.Context) (domain.ParsedLog, error)) error {
+		RunAndReturn(func(txCtx context.Context, _ int64, parse func(context.Context) (domain.ParsedLog, error)) error {
 			got, err := parse(txCtx)
 			require.NoError(t, err)
 			require.Equal(t, parsed, got)
@@ -93,7 +93,7 @@ func TestTopologyServiceParseMarksLogFailed(t *testing.T) {
 		Once()
 	repo.EXPECT().
 		ProcessParsedLog(ctx, int64(11), mock.Anything).
-		RunAndReturn(func(txCtx context.Context, logID int64, parse func(context.Context) (domain.ParsedLog, error)) error {
+		RunAndReturn(func(txCtx context.Context, _ int64, parse func(context.Context) (domain.ParsedLog, error)) error {
 			_, err := parse(txCtx)
 			return err
 		}).

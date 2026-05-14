@@ -184,6 +184,8 @@ func (s *parseState) consumeCSV(lineNo int, line string) error {
 		return s.consumeNodeRow(lineNo, row)
 	case sectionPorts:
 		return s.consumePortRow(lineNo, row)
+	case sectionNone, sectionUnknown:
+		return fmt.Errorf("line %d: csv row outside section", lineNo)
 	default:
 		return fmt.Errorf("line %d: csv row outside section", lineNo)
 	}

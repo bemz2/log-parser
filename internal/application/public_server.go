@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"log-parser/internal"
 	transport "log-parser/internal/delivery/http"
@@ -31,8 +32,9 @@ func NewPublicServer(cfg internal.Config, logger *slog.Logger) *PublicServer {
 func (s *PublicServer) Configure(handler http.Handler) {
 	chain := middleware.Recover(s.logger)(middleware.Logging(s.logger)(handler))
 	s.server = &http.Server{
-		Addr:    ":" + s.cfg.Port,
-		Handler: chain,
+		Addr:              ":" + s.cfg.Port,
+		Handler:           chain,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 }
 

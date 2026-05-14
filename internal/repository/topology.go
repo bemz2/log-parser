@@ -139,7 +139,7 @@ func (r *TopologyRepository) GetTopology(ctx context.Context, logID int64) (doma
 		return domain.Topology{}, err
 	}
 
-	nodes, err := r.listNodes(ctx, `WHERE log_id = $1 ORDER BY id`, logID)
+	nodes, err := r.listNodesByLogID(ctx, logID)
 	if err != nil {
 		return domain.Topology{}, err
 	}
@@ -156,7 +156,7 @@ func (r *TopologyRepository) GetTopology(ctx context.Context, logID int64) (doma
 }
 
 func (r *TopologyRepository) GetNode(ctx context.Context, nodeID int64) (domain.Node, error) {
-	nodes, err := r.listNodes(ctx, `WHERE id = $1`, nodeID)
+	nodes, err := r.listNodesByID(ctx, nodeID)
 	if err != nil {
 		return domain.Node{}, err
 	}
@@ -205,16 +205,36 @@ func (r *TopologyRepository) GetPortsByNode(ctx context.Context, nodeID int64) (
 	return ports, nil
 }
 
-func (r *TopologyRepository) listNodes(ctx context.Context, condition string, args ...any) ([]domain.Node, error) {
+func (r *TopologyRepository) listNodesByLogID(ctx context.Context, logID int64) ([]domain.Node, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT id, log_id, external_id, name, type, created_at
 		FROM nodes
-		`+condition, args...)
+		WHERE log_id = $1
+		ORDER BY id
+	`, logID)
 	if err != nil {
 		return nil, fmt.Errorf("query nodes: %w", err)
 	}
 	defer func() { _ = rows.Close() }()
 
+	return scanNodes(rows)
+}
+
+func (r *TopologyRepository) listNodesByID(ctx context.Context, nodeID int64) ([]domain.Node, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT id, log_id, external_id, name, type, created_at
+		FROM nodes
+		WHERE id = $1
+	`, nodeID)
+	if err != nil {
+		return nil, fmt.Errorf("query nodes: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+
+	return scanNodes(rows)
+}
+
+func scanNodes(rows *sql.Rows) ([]domain.Node, error) {
 	nodes := make([]domain.Node, 0)
 	for rows.Next() {
 		var node domain.Node
