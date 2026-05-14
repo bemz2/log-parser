@@ -7,7 +7,10 @@ import (
 
 	"topology-parser/internal"
 	"topology-parser/internal/client/postgres"
+	handler "topology-parser/internal/delivery/http/handler"
 	"topology-parser/internal/migration"
+	"topology-parser/internal/repository"
+	"topology-parser/internal/service"
 )
 
 type Container struct {
@@ -16,6 +19,10 @@ type Container struct {
 	DB     *sql.DB
 
 	PublicServer *PublicServer
+
+	TopologyRepo    *repository.TopologyRepository
+	TopologyService *service.TopologyService
+	TopologyHandler *handler.TopologyHandler
 }
 
 func NewContainer(cfg internal.Config, logger *slog.Logger) *Container {
@@ -36,8 +43,15 @@ func (c *Container) Init(ctx context.Context) error {
 		return err
 	}
 
+	c.TopologyRepo = repository.NewTopologyRepository(c.DB)
+	c.TopologyService = service.NewDefaultTopologyService(c.TopologyRepo, c.Config.DataDir, c.Logger)
+	c.TopologyHandler = handler.NewTopologyHandler(c.TopologyService)
+
+	mux := NewMux()
+	c.TopologyHandler.Register(mux)
+
 	c.PublicServer = NewPublicServer(c.Config, c.Logger)
-	c.PublicServer.Configure(NewMux())
+	c.PublicServer.Configure(mux)
 	return nil
 }
 
