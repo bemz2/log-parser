@@ -43,12 +43,17 @@ func (r *TopologyRepository) MarkLogFailed(ctx context.Context, logID int64, mes
 	return nil
 }
 
-func (r *TopologyRepository) SaveParsedLog(ctx context.Context, logID int64, parsed domain.ParsedLog) error {
+func (r *TopologyRepository) ProcessParsedLog(ctx context.Context, logID int64, parse func(context.Context) (domain.ParsedLog, error)) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin transaction: %w", err)
 	}
 	defer func() { _ = tx.Rollback() }()
+
+	parsed, err := parse(ctx)
+	if err != nil {
+		return err
+	}
 
 	nodeStmt, err := tx.PrepareContext(ctx, `
 		INSERT INTO nodes(log_id, external_id, name, type)

@@ -21,7 +21,7 @@ var (
 type TopologyRepository interface {
 	CreateLog(ctx context.Context, filePath string) (int64, error)
 	MarkLogFailed(ctx context.Context, logID int64, message string) error
-	SaveParsedLog(ctx context.Context, logID int64, parsed domain.ParsedLog) error
+	ProcessParsedLog(ctx context.Context, logID int64, parse func(context.Context) (domain.ParsedLog, error)) error
 	GetLog(ctx context.Context, logID int64) (domain.Log, error)
 	GetTopology(ctx context.Context, logID int64) (domain.Topology, error)
 	GetNode(ctx context.Context, nodeID int64) (domain.Node, error)
@@ -68,19 +68,14 @@ func (s *TopologyService) Parse(ctx context.Context, requestedPath string) (Pars
 		return ParseResult{}, err
 	}
 
-	parsed, err := s.parser.ParseFile(ctx, absPath)
+	err = s.repo.ProcessParsedLog(ctx, logID, func(txCtx context.Context) (domain.ParsedLog, error) {
+		return s.parser.ParseFile(txCtx, absPath)
+	})
 	if err != nil {
 		if markErr := s.repo.MarkLogFailed(ctx, logID, err.Error()); markErr != nil {
 			s.logger.ErrorContext(ctx, "failed to mark log as failed", "log_id", logID, "error", markErr)
 		}
-		return ParseResult{LogID: logID, Status: domain.LogStatusFailed}, fmt.Errorf("parse log: %w", err)
-	}
-
-	if err := s.repo.SaveParsedLog(ctx, logID, parsed); err != nil {
-		if markErr := s.repo.MarkLogFailed(ctx, logID, err.Error()); markErr != nil {
-			s.logger.ErrorContext(ctx, "failed to mark log as failed", "log_id", logID, "error", markErr)
-		}
-		return ParseResult{LogID: logID, Status: domain.LogStatusFailed}, err
+		return ParseResult{LogID: logID, Status: domain.LogStatusFailed}, fmt.Errorf("process log: %w", err)
 	}
 
 	return ParseResult{LogID: logID, Status: domain.LogStatusParsed}, nil
