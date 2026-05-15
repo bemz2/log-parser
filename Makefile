@@ -24,7 +24,7 @@ setup:
 ensure-configs: ensure-env ensure-compose
 
 ensure-env:
-	test -f .env || cp .env.sample .env
+	test -f .env || cp samples/.env.sample .env
 
 ensure-compose:
 	test -f docker-compose.yml || cp samples/docker-compose.yml.sample docker-compose.yml

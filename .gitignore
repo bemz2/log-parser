@@ -7,4 +7,3 @@ tmp/
 postgres-data/
 mocks/
 docker-compose.yml
-README.md
