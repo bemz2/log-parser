@@ -43,7 +43,7 @@ postman_collection.json           Postman collection
 ## Запуск
 
 ```bash
-cp .env.sample .env
+cp samples/.env.sample .env
 docker compose up -d
 ```
 
